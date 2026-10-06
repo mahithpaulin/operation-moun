@@ -154,12 +154,16 @@ def synthesize_loops(task, budget=3000000):
                     return {"prog": f"S1b acc={i0} range1({b}) acc={u}",
                             "tried": tried[0]}
     # --- S2 (pair) ---
+    # Updates that ignore both state vars are pointless (constant assignment
+    # inside a loop). Mention-filter cuts the S2 inner product ~10x.
     ab, ab1 = pool(task["args"], ["a", "b"], henvs)
+    ab_use = [e for e in ab if "a" in e or "b" in e]
+    ab1_use = [e for e in ab1 if "a" in e or "b" in e]
     for i0 in i0s:
         for i1 in i0s:
             for b in bs:
-                for u0 in ab1:
-                    for u1 in ab:
+                for u0 in ab1_use:
+                    for u1 in ab_use:
                         for ret in ("a", "b"):
                             if over():
                                 return {"miss": True, "tried": tried[0]}
