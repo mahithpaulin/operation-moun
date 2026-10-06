@@ -1,0 +1,44 @@
+{
+  "rows": [
+    {
+      "task": "sort_first",
+      "cold_solved": true,
+      "cold_tested": 16,
+      "cold_prog": "min(x)",
+      "warm_solved": true,
+      "warm_tested": 8,
+      "warm_prog": "min(x)",
+      "ratio": 0.5
+    },
+    {
+      "task": "list_sum",
+      "cold_solved": true,
+      "cold_tested": 15,
+      "cold_prog": "sum(x)",
+      "warm_solved": true,
+      "warm_tested": 8,
+      "warm_prog": "sum(x)",
+      "ratio": 0.5333333333333333
+    },
+    {
+      "task": "max_gap",
+      "cold_solved": true,
+      "cold_tested": 468,
+      "cold_prog": "(max(x) - min(x))",
+      "warm_solved": true,
+      "warm_tested": 76,
+      "warm_prog": "(max(x) - min(x))",
+      "ratio": 0.1623931623931624
+    },
+    {
+      "task": "second_sorted",
+      "cold_solved": true,
+      "cold_tested": 150,
+      "cold_prog": "(sorted(x)[1])",
+      "warm_solved": true,
+      "warm_tested": 84,
+      "warm_prog": "(sorted(x)[1])",
+      "ratio": 0.56
+    }
+  ]
+}
