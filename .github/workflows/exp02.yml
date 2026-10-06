@@ -26,7 +26,11 @@ jobs:
           git config user.name "moun-bot"
           git config user.email "moun-bot@users.noreply.github.com"
           git add results/
-          git diff --cached --quiet && exit 0
+          git status --short
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
           git commit -m "exp02 results [skip ci]"
           for i in 1 2 3; do
             git fetch origin main && git rebase origin/main && git push && break

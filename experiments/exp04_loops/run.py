@@ -18,6 +18,8 @@ def main():
     args = ap.parse_args()
 
     rows = []
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
     for t in TASKS:
         t0 = time.perf_counter()
         r = synthesize_loops(t, args.budget)
@@ -28,9 +30,8 @@ def main():
         print(f"{t['name']:10s} {'SOLVED' if 'prog' in r else 'miss':6s} "
               f"tried={r.get('tried')} {dt:.1f}s {(r.get('prog') or '')[:60]}",
               flush=True)
+        out.write_text(json.dumps({"rows": rows}, indent=2))
     print(f"\n{sum(r['solved'] for r in rows)}/{len(rows)} solved")
-    out = Path(args.out)
-    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps({"rows": rows}, indent=2))
 
 

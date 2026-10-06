@@ -16,8 +16,13 @@ CAP = 10 ** 6
 
 
 def pool(args, extra_vars, envs, size_cap=3):
-    """Small exprs over args+extra_vars, ONE per behavior on envs."""
-    leaves = list(args) + list(extra_vars) + [repr(c) for c in CONSTS]
+    """Small exprs over args+extra_vars, ONE per behavior on envs.
+
+    Leaves ordered consts-first: inits/first-holes are almost always small
+    constants (0/1); vars come after. (A var-first order buries fib's i0=0
+    behind 54 i0s x full subspaces each.)
+    """
+    leaves = [repr(c) for c in CONSTS] + list(args) + list(extra_vars)
     kept, seen, by_size = [], set(), {1: []}
     for l in leaves:
         s = _sig(l, envs)
