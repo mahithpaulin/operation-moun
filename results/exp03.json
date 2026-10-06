@@ -1,0 +1,68 @@
+{
+  "rows": [
+    {
+      "task": "add",
+      "solved": true,
+      "tested": 19,
+      "blind_tested": 23,
+      "ratio": 0.826,
+      "prog": "(x + y)"
+    },
+    {
+      "task": "mul",
+      "solved": true,
+      "tested": 72,
+      "blind_tested": 76,
+      "ratio": 0.947,
+      "prog": "(x * y)"
+    },
+    {
+      "task": "is_even",
+      "solved": true,
+      "tested": 1280,
+      "blind_tested": 161,
+      "ratio": 7.95,
+      "prog": "(0 == (x % 2))"
+    },
+    {
+      "task": "max_two",
+      "solved": true,
+      "tested": 7505,
+      "blind_tested": 14764,
+      "ratio": 0.508,
+      "prog": "(y if (x < y) else x)"
+    },
+    {
+      "task": "abs_val",
+      "solved": true,
+      "tested": 28614,
+      "blind_tested": 22025,
+      "ratio": 1.299,
+      "prog": "(x if (0 < x) else (- x))"
+    },
+    {
+      "task": "pow2",
+      "solved": true,
+      "tested": 49,
+      "blind_tested": 50,
+      "ratio": 0.98,
+      "prog": "(x * x)"
+    },
+    {
+      "task": "sum_to_n",
+      "solved": true,
+      "tested": 21574,
+      "blind_tested": 47026,
+      "ratio": 0.459,
+      "prog": "((x + (x * x)) // 2)"
+    },
+    {
+      "task": "fib",
+      "solved": false,
+      "tested": 300000,
+      "blind_tested": 300000,
+      "ratio": null,
+      "prog": null
+    }
+  ]
+}
