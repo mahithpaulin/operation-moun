@@ -1,0 +1,4 @@
+# exp04 kernel manifest: order matters (deps first)
+experiments/exp04_loops/tasks.py
+experiments/exp04_loops/loop.py
+experiments/exp04_loops/run.py

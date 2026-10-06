@@ -1,6 +1,7 @@
 """exp04 driver: loop schemas on iteration tasks."""
 import argparse
 import json
+import os
 import sys
 import time
 from pathlib import Path
@@ -13,7 +14,8 @@ from loop import synthesize_loops  # noqa: E402
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--budget", type=int, default=2000000)
+    ap.add_argument("--budget", type=int,
+                    default=int(os.environ.get("EXP04_BUDGET", 2000000)))
     ap.add_argument("--out", default="results/exp04.json")
     args = ap.parse_args()
 

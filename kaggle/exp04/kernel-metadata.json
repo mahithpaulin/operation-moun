@@ -1,0 +1,10 @@
+{
+  "id": "mahithpaulin/moun-exp04-loops",
+  "title": "moun-exp04-loops",
+  "code_file": "kernel.py",
+  "language": "python",
+  "kernel_type": "script",
+  "is_private": true,
+  "enable_internet": false,
+  "session_timeout_seconds": 7200
+}
