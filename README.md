@@ -4,10 +4,12 @@
 No fine-tuning, no pretrained weights, no GPU training. We compete where
 scale doesn't matter: search + verification + accumulated knowledge.
 Start at [`BRAINSTORM.md`](BRAINSTORM.md) (10 novel directions, scored),
-then [`EXPERIMENTS.md`](EXPERIMENTS.md) (the falsifiable ladder).
-First blood: `experiments/exp01_enumeration` — bottom-up enumeration with
-behavioral pruning solved **7/8 smoke tasks**, including discovering the
-closed form `n(n+1)/2` for a task designed to need loops.
+then [`EXPERIMENTS.md`](EXPERIMENTS.md) (the falsifiable ladder),
+then [`RESEARCH.md`](RESEARCH.md) (verdicts + thesis).
+
+Scoreboard (all CI-committed in `results/`): exp01 7/8 · exp02 4/8
+(falsified) · exp03 7/8 · exp04 3/4 · exp05 4/4 · exp06 2/2 with depth
+5→3 at 12–18× less search. Thesis: only accumulated knowledge compounds.
 
 **Direction v0.1 (shelved): from-scratch micro-decoder + 15h Kaggle train.**
 Kept in `src/moun/` + `SPEC.md` + `BUDGET.md` for the eventual neural-guide
