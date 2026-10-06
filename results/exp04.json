@@ -1,0 +1,33 @@
+{
+  "rows": [
+    {
+      "task": "fact",
+      "solved": true,
+      "tried": 6510,
+      "secs": 0.39,
+      "prog": "S1b acc=1 range1((1 + x)) acc=(acc * i)"
+    },
+    {
+      "task": "pow2n",
+      "solved": true,
+      "tried": 723,
+      "secs": 0.05,
+      "prog": "S1 acc=1 range(x) acc=(acc + acc)"
+    },
+    {
+      "task": "sum_to_n",
+      "solved": true,
+      "tried": 73,
+      "secs": 0.01,
+      "prog": "S1 acc=0 range((1 + x)) acc=(acc + i)"
+    },
+    {
+      "task": "fib",
+      "solved": false,
+      "tried": null,
+      "secs": null,
+      "prog": null,
+      "note": "shard hit 25-min CI cap at 200k budget; open chase, see RESEARCH.md"
+    }
+  ]
+}

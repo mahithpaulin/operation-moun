@@ -12,7 +12,7 @@ seed-pinned, committed as JSON by CI.
 | exp01 | bottom-up enumeration + behavioral pruning | 7/8 smoke | ✅ baseline; discovered closed-form `n(n+1)/2` for a "needs loops" task |
 | exp02 | CEGIS, persistent bank | 4/8 | ❌ FALSIFIED: guidance loses to pruning power on ev-cost; only query-count wins (4–5 vs 8 examples) |
 | exp03 | typed int/bool banks (R1–R5) | 7/8 | ⚠️ ~2× on hard tasks (`max_two` 0.51×, `sum_to_n` 0.46×); 8× worse on `is_even` (small-task luck) |
-| exp04 | loop schemas S1/S1b/S2 | 3/4 (+fib open) | ⚠️ schemas crack iteration in ≤723 tries; `fib` needs S2 ordering still being tuned |
+| exp04 | loop schemas S1/S1b/S2 | **3/4** (sum 73 tries, pow2n 723, fact 6510 via S1b) | ⚠️ schemas crack iteration cheaply; `fib` needs S2 ordering still being tuned (200k-budget shard timed out) |
 | exp05 | retrieval-seeded API synthesis | 4/4, warm 0.16–0.56× | ✅ compositional reuse + shorter programs (`min(x)` beats `sorted(x)[0]`) |
 | exp06 | library macros from solved tasks | depth 5→3, 12–18× fewer | ✅✅ flagship: knowledge compounds; distractor unused |
 
