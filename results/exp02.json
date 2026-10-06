@@ -79,7 +79,7 @@
       "blind_tested": 14764,
       "blind_evcalls_ub": 118112,
       "ratio": null,
-      "secs": 0.08,
+      "secs": 0.16,
       "prog": null,
       "trace": [
         {
@@ -100,7 +100,7 @@
       "blind_tested": 22025,
       "blind_evcalls_ub": 176200,
       "ratio": null,
-      "secs": 0.05,
+      "secs": 0.11,
       "prog": null,
       "trace": []
     },
@@ -135,7 +135,7 @@
       "blind_tested": 47026,
       "blind_evcalls_ub": 376208,
       "ratio": null,
-      "secs": 0.05,
+      "secs": 0.1,
       "prog": null,
       "trace": []
     },
@@ -149,7 +149,7 @@
       "blind_tested": null,
       "blind_evcalls_ub": null,
       "ratio": null,
-      "secs": 0.05,
+      "secs": 0.1,
       "prog": null,
       "trace": []
     }
