@@ -1,0 +1,32 @@
+{
+  "rows": [
+    {
+      "task": "sum_to_n",
+      "solved": false,
+      "tried": 60001,
+      "secs": 24.49,
+      "prog": null
+    },
+    {
+      "task": "fib",
+      "solved": false,
+      "tried": 60001,
+      "secs": 24.32,
+      "prog": null
+    },
+    {
+      "task": "fact",
+      "solved": false,
+      "tried": 60001,
+      "secs": 24.62,
+      "prog": null
+    },
+    {
+      "task": "pow2n",
+      "solved": false,
+      "tried": 60001,
+      "secs": 23.91,
+      "prog": null
+    }
+  ]
+}

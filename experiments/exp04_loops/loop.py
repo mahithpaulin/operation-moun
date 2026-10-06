@@ -1,24 +1,30 @@
 """Loop-schema synthesis: fixed control skeletons, enumerated hole exprs.
 
-Schemas (holes filled from a small typed expr pool, size<=4):
-  S1 acc-loop : acc=<I0>; for i in range(<B>): acc=<U(acc,i,x)>; return acc
-  S2 pair-loop: a,b=<I0>,<I1>; for _ in range(<B>): a,b=<U0>,<U1>; return <R>
-Combos are EXECUTED (not symbolically reasoned): bound values capped, straight
-line bodies, exceptions -> combo rejected. Novel bits: none of the machinery
-is new; the claim is only that schemas crack what pure expressions cannot.
+Schemas (holes from behaviorally-deduped expr pools, size<=3):
+  S1  acc-loop 0-based: acc=<I0>; for i in range(<B>): acc=<U>; return acc
+  S1b acc-loop 1-based: acc=<I0>; for i in range(1,<B>): acc=<U>; return acc
+  S2  pair-loop: a,b=<I0>,<I1>; for _ in range(<B>): a,b=<U0>,<U1>; return <R>
+Combos are EXECUTED: bounds capped at 40, bodies straight-line, exceptions
+reject the combo. Pools are deduped by behavior on the task inputs
+(x+0 dies so (x+1) is found sooner). Claim: schemas crack iteration tasks
+that pure expression grammars cannot express at any size.
 """
-import itertools
-
 CONSTS = [0, 1, 2, -1, 3, 5, 10]
 ARITH = ["+", "-", "*"]
 MAX_ITER = 40
+CAP = 10 ** 6
 
 
-def pool(args, extra_vars, size_cap=4):
-    """All small exprs over args+extra_vars. Returns {source: evaluator}."""
+def pool(args, extra_vars, envs, size_cap=3):
+    """Small exprs over args+extra_vars, ONE per behavior on envs."""
     leaves = list(args) + list(extra_vars) + [repr(c) for c in CONSTS]
-    exprs = {l: l for l in leaves}
-    by_size = {1: list(leaves)}
+    kept, seen, by_size = [], set(), {1: []}
+    for l in leaves:
+        s = _sig(l, envs)
+        if s is not None and s not in seen:
+            seen.add(s)
+            kept.append(l)
+            by_size[1].append(l)
     for s in range(2, size_cap + 1):
         cur = []
         for l in range(1, s - 1):
@@ -29,91 +35,126 @@ def pool(args, extra_vars, size_cap=4):
                 for a in by_size[l]:
                     for b in by_size[r]:
                         cur.append(f"({a} {op} {b})")
-        # unary minus
         if s - 1 in by_size:
             for a in by_size[s - 1]:
                 cur.append(f"(- {a})")
-        by_size[s] = cur
+        sized = []
         for e in cur:
-            exprs.setdefault(e, e)
-    return exprs
+            g = _sig(e, envs)
+            if g is not None and g not in seen:
+                seen.add(g)
+                kept.append(e)
+                sized.append(e)
+        by_size[s] = sized
+    return kept
 
 
-def run_schema(src, args, ins, cap_iter=MAX_ITER):
+def _sig(src, envs):
+    try:
+        code = compile(src, "<pool>", "eval")
+    except Exception:
+        return None
+    out = []
+    for e in envs:
+        try:
+            v = eval(code, {"__builtins__": {}}, dict(e))
+        except Exception:
+            return None
+        if isinstance(v, bool) or not isinstance(v, int) or abs(v) > CAP:
+            return None
+        out.append(v)
+    return tuple(out)
+
+
+_SAFE_BUILTINS = {"isinstance": isinstance, "range": range, "int": int}
+
+
+def run_schema(src, args, ins):
     ns = dict(zip(args, ins))
     try:
-        exec(compile(src, "<loop>", "exec"), {"__builtins__": {}}, ns)
-    except Exception as e:
-        return None, f"{type(e).__name__}"
-    return ns.get("__out__", None), None
+        exec(compile(src, "<loop>", "exec"),
+             {"__builtins__": _SAFE_BUILTINS}, ns)
+    except Exception:
+        return None
+    return ns.get("__out__", None)
 
 
-def s1_source(i0, b, u, args):
-    x = args[0]
-    return (f"__b = ({b})\n"
-            f"__out__ = None\n"
-            f"acc = ({i0})\n"
-            f"__n = 0\n"
-            f"for i in range(__b if isinstance(__b, int) and 0 <= __b <= {MAX_ITER} else 0):\n"
-            f"    acc = ({u})\n"
-            f"    __n += 1\n"
-            f"__out__ = acc")
+def _guard(bound):
+    return (f"range(__b if isinstance(__b, int) and 0 <= __b <= {MAX_ITER} "
+            f"else 0)")
 
 
-def s2_source(i0, i1, b, u0, u1, ret, args):
-    return (f"__b = ({b})\n"
-            f"a = ({i0})\n"
-            f"b = ({i1})\n"
-            f"for _ in range(__b if isinstance(__b, int) and 0 <= __b <= {MAX_ITER} else 0):\n"
-            f"    a, b = ({u0}), ({u1})\n"
+def s1_source(i0, b, u):
+    return (f"__b = ({b})\nacc = ({i0})\n"
+            f"for i in {_guard('__b')}:\n    acc = ({u})\n__out__ = acc")
+
+
+def s1b_source(i0, b, u):
+    return (f"__b = ({b})\nacc = ({i0})\n"
+            f"for i in range(1, (__b if isinstance(__b, int) and 1 <= __b <= {MAX_ITER + 1} else 1)):\n"
+            f"    acc = ({u})\n__out__ = acc")
+
+
+def s2_source(i0, i1, b, u0, u1, ret):
+    return (f"__b = ({b})\na = ({i0})\nb = ({i1})\n"
+            f"for _ in {_guard('__b')}:\n    a, b = ({u0}), ({u1})\n"
             f"__out__ = ({ret})")
 
 
 def check(src, task):
     for ins, want in task["io"]:
-        got, _ = run_schema(src, task["args"], ins)
-        if isinstance(want, bool):
-            if not isinstance(got, bool) or got != want:
-                return False
-        elif got != want or isinstance(got, bool):
+        got = run_schema(src, task["args"], ins)
+        if got != want or isinstance(got, bool):
             return False
     return True
 
 
-def synthesize_loops(task, budget=2000000):
-    p1 = pool(task["args"], [], 4)
-    tried = 0
-    # init/bound holes must not reference loop vars (unbound at that point);
-    # bounds must scale with the input (constant bounds can't generalize).
+def synthesize_loops(task, budget=3000000):
+    envs = [{a: v for a, v in zip(task["args"], ins)} for ins, _ in task["io"]]
+    p1 = pool(task["args"], [], envs)
     i0s = list(p1)
     bs = [e for e in p1 if "x" in e]
-    # --- S1 ---
-    acc_pool = pool(task["args"], ["acc", "i"], 4)
-    us = [e for e in acc_pool if "acc" in e]
+    tried = [0]
+    # hole envs bind loop vars to sample values (i/x kept distinct so they
+    # never merge under dedupe). Dedupe is relative to these samples.
+    henvs = [{task["args"][0]: xv, "acc": av, "i": iv, "a": av, "b": iv}
+             for xv in (0, 1, 5) for av in (0, 1, 5) for iv in (0, 2, 7)]
+
+    def over():
+        tried[0] += 1
+        return tried[0] > budget
+
+    # --- S1 (0-based) ---
+    us = [e for e in pool(task["args"], ["acc", "i"], henvs) if "acc" in e]
     for i0 in i0s:
         for b in bs:
             for u in us:
-                tried += 1
-                if tried > budget:
-                    return {"miss": True, "tried": tried}
-                if check(s1_source(i0, b, u, task["args"]), task):
+                if over():
+                    return {"miss": True, "tried": tried[0]}
+                if check(s1_source(i0, b, u), task):
                     return {"prog": f"S1 acc={i0} range({b}) acc={u}",
-                            "tried": tried}
-    # --- S2 ---
-    r_pool = ["a", "b"]
-    ab_pool = pool(task["args"], ["a", "b"], 4)
+                            "tried": tried[0]}
+    # --- S1b (1-based) ---
+    for i0 in i0s:
+        for b in bs:
+            for u in us:
+                if over():
+                    return {"miss": True, "tried": tried[0]}
+                if check(s1b_source(i0, b, u), task):
+                    return {"prog": f"S1b acc={i0} range1({b}) acc={u}",
+                            "tried": tried[0]}
+    # --- S2 (pair) ---
+    ab = pool(task["args"], ["a", "b"], henvs)
     for i0 in i0s:
         for i1 in i0s:
             for b in bs:
-                for u0 in ab_pool:
-                    for u1 in ab_pool:
-                        for ret in r_pool:
-                            tried += 1
-                            if tried > budget:
-                                return {"miss": True, "tried": tried}
-                            if check(s2_source(i0, i1, b, u0, u1, ret,
-                                               task["args"]), task):
+                for u0 in ab:
+                    for u1 in ab:
+                        for ret in ("a", "b"):
+                            if over():
+                                return {"miss": True, "tried": tried[0]}
+                            if check(s2_source(i0, i1, b, u0, u1, ret), task):
                                 return {"prog": f"S2 a,b={i0},{i1} range({b}) "
                                                 f"a,b={u0},{u1} ret={ret}",
-                                        "tried": tried}
-    return {"miss": True, "tried": tried}
+                                        "tried": tried[0]}
+    return {"miss": True, "tried": tried[0]}
