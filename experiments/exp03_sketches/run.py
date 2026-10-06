@@ -37,6 +37,9 @@ def main():
               f"{(r.get('prog') or '')[:55]}", flush=True)
     sol = [x for x in rows if x["solved"]]
     print(f"\n{len(sol)}/{len(rows)} solved")
+    out = Path(args.out)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps({"rows": rows}, indent=2))
 
 
 if __name__ == "__main__":
