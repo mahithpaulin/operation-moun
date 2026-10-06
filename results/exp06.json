@@ -1,0 +1,33 @@
+{
+  "library": {
+    "SQ": "(x * x)",
+    "INC": "(x + 1)",
+    "FAR": "(x + 100)"
+  },
+  "rows": [
+    {
+      "task": "sq_inc",
+      "cold_solved": true,
+      "cold_size": 5,
+      "cold_tested": 450,
+      "cold_prog": "(1 + (x * x))",
+      "warm_solved": true,
+      "warm_size": 3,
+      "warm_tested": 38,
+      "warm_prog": "(1 + SQ(x))",
+      "ratio": 0.08444444444444445
+    },
+    {
+      "task": "inc_sq",
+      "cold_solved": true,
+      "cold_size": 5,
+      "cold_tested": 2488,
+      "cold_prog": "((x + 1) ** 2)",
+      "warm_solved": true,
+      "warm_size": 3,
+      "warm_tested": 136,
+      "warm_prog": "(INC(x) * INC(x))",
+      "ratio": 0.05466237942122187
+    }
+  ]
+}
