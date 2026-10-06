@@ -100,7 +100,7 @@
       "blind_tested": 22025,
       "blind_evcalls_ub": 176200,
       "ratio": null,
-      "secs": 0.11,
+      "secs": 0.1,
       "prog": null,
       "trace": []
     },
