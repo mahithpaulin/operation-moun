@@ -51,7 +51,7 @@ def pool(args, extra_vars, envs, size_cap=3):
                 kept.append(e)
                 sized.append(e)
         by_size[s] = sized
-    return kept
+    return kept, list(by_size[1])
 
 
 def _sig(src, envs):
@@ -116,8 +116,11 @@ def check(src, task):
 
 def synthesize_loops(task, budget=3000000):
     envs = [{a: v for a, v in zip(task["args"], ins)} for ins, _ in task["io"]]
-    p1 = pool(task["args"], [], envs)
-    i0s = list(p1)
+    p1, l1 = pool(task["args"], [], envs)
+    # Inits and pair-updates are leaves in every solved instance so far
+    # (0/1/x/a/b); bounds and accumulators need full exprs. Capping the
+    # former cuts S2's inner product ~40x. Documented bet, not theorem.
+    i0s = list(l1)
     bs = [e for e in p1 if "x" in e]
     tried = [0]
     # hole envs bind loop vars to sample values (i/x kept distinct so they
@@ -130,7 +133,9 @@ def synthesize_loops(task, budget=3000000):
         return tried[0] > budget
 
     # --- S1 (0-based) ---
-    us = [e for e in pool(task["args"], ["acc", "i"], henvs) if "acc" in e]
+    acc_all, acc_leaves = pool(task["args"], ["acc", "i"], henvs)
+    leaf_us = [e for e in acc_leaves if "acc" in e]
+    us = leaf_us + [e for e in acc_all if "acc" in e and e not in leaf_us]
     for i0 in i0s:
         for b in bs:
             for u in us:
@@ -149,11 +154,11 @@ def synthesize_loops(task, budget=3000000):
                     return {"prog": f"S1b acc={i0} range1({b}) acc={u}",
                             "tried": tried[0]}
     # --- S2 (pair) ---
-    ab = pool(task["args"], ["a", "b"], henvs)
+    ab, ab1 = pool(task["args"], ["a", "b"], henvs)
     for i0 in i0s:
         for i1 in i0s:
             for b in bs:
-                for u0 in ab:
+                for u0 in ab1:
                     for u1 in ab:
                         for ret in ("a", "b"):
                             if over():
