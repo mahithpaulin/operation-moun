@@ -14,6 +14,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
@@ -23,7 +25,11 @@ jobs:
         run: |
           git config user.name "moun-bot"
           git config user.email "moun-bot@users.noreply.github.com"
-          git pull --rebase 2>/dev/null || true
           git add results/
-          git diff --cached --quiet || git commit -m "exp01 results [skip ci]"
-          git push
+          git diff --cached --quiet && exit 0
+          git commit -m "exp01 results [skip ci]"
+          for i in 1 2 3; do
+            git fetch origin main && git rebase origin/main && git push && break
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
