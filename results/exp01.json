@@ -1,0 +1,82 @@
+{
+  "solved": 7,
+  "total": 8,
+  "rows": [
+    {
+      "task": "add",
+      "solved": true,
+      "detail": {
+        "prog": "(x + y)",
+        "size": 3,
+        "tested": 23
+      },
+      "secs": 0.0
+    },
+    {
+      "task": "mul",
+      "solved": true,
+      "detail": {
+        "prog": "(x * y)",
+        "size": 3,
+        "tested": 76
+      },
+      "secs": 0.0
+    },
+    {
+      "task": "is_even",
+      "solved": true,
+      "detail": {
+        "prog": "(not (x % 2))",
+        "size": 4,
+        "tested": 161
+      },
+      "secs": 0.0
+    },
+    {
+      "task": "max_two",
+      "solved": true,
+      "detail": {
+        "prog": "(y if (x < y) else x)",
+        "size": 6,
+        "tested": 14764
+      },
+      "secs": 1.2
+    },
+    {
+      "task": "abs_val",
+      "solved": true,
+      "detail": {
+        "prog": "(x * (-1 ** (x < 0)))",
+        "size": 7,
+        "tested": 22025
+      },
+      "secs": 0.99
+    },
+    {
+      "task": "pow2",
+      "solved": true,
+      "detail": {
+        "prog": "(x * x)",
+        "size": 3,
+        "tested": 50
+      },
+      "secs": 0.0
+    },
+    {
+      "task": "sum_to_n",
+      "solved": true,
+      "detail": {
+        "prog": "((x + (x * x)) // 2)",
+        "size": 7,
+        "tested": 47026
+      },
+      "secs": 4.56
+    },
+    {
+      "task": "fib",
+      "solved": false,
+      "detail": null,
+      "secs": 31.17
+    }
+  ]
+}
