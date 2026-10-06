@@ -52,7 +52,7 @@
       "blind_tested": 161,
       "blind_evcalls_ub": 1288,
       "ratio": 3.605,
-      "secs": 0.01,
+      "secs": 0.0,
       "prog": "(not (- (x % 2)))",
       "trace": [
         {
@@ -100,7 +100,7 @@
       "blind_tested": 22025,
       "blind_evcalls_ub": 176200,
       "ratio": null,
-      "secs": 0.1,
+      "secs": 0.08,
       "prog": null,
       "trace": []
     },
@@ -135,7 +135,7 @@
       "blind_tested": 47026,
       "blind_evcalls_ub": 376208,
       "ratio": null,
-      "secs": 0.09,
+      "secs": 0.08,
       "prog": null,
       "trace": []
     },
