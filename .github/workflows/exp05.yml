@@ -1,0 +1,39 @@
+name: exp05
+on:
+  push:
+    branches: [main]
+    paths: ['experiments/exp05_retrieval/**', 'experiments/exp01_enumeration/synth.py', '.github/workflows/exp05.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  exp05:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run exp05 (no deps, stdlib only)
+        run: python3 experiments/exp05_retrieval/run.py --max-size 9 --max-programs 300000 --out results/exp05.json
+      - name: Commit results
+        run: |
+          git config user.name "moun-bot"
+          git config user.email "moun-bot@users.noreply.github.com"
+          git add results/
+          git status --short
+          if git diff --cached --quiet; then
+            echo "nothing to commit"
+            exit 0
+          fi
+          git commit -m "exp05 results [skip ci]"
+          for i in 1 2 3; do
+            git fetch origin main && git rebase origin/main && git push && break
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done

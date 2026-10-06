@@ -13,7 +13,7 @@ import sys
 from pathlib import Path
 
 STRIP_IMPORT = re.compile(
-    r"^\s*(from\s+(tasks|loop|synth|cegis|sketch|run)\s+import\s+.*|"
+    r"^\s*(from\s+(tasks|loop|cegis|sketch|run|api|synth_api)\s+import\s+.*|"
     r"sys\.path\.insert.*|from\s+pathlib\s+import.*|import\s+sys\s*)$")
 
 
