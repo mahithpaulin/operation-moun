@@ -1,29 +1,29 @@
-name: exp01
+name: exp03
 on:
   push:
     branches: [main]
-    paths: ['experiments/exp01_enumeration/**', '.github/workflows/exp01.yml']
+    paths: ['experiments/exp03_sketches/**', 'experiments/exp01_enumeration/synth.py', '.github/workflows/exp03.yml']
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  exp01:
+  exp03:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run exp01 (no deps, stdlib only)
-        run: python3 experiments/exp01_enumeration/run.py --max-size 9 --max-programs 300000 --out results/exp01.json
+      - name: Run exp03 (no deps, stdlib only)
+        run: python3 experiments/exp03_sketches/run.py --max-size 9 --max-programs 300000 --out results/exp03.json
       - name: Commit results
         run: |
           git config user.name "moun-bot"
           git config user.email "moun-bot@users.noreply.github.com"
           git pull --rebase 2>/dev/null || true
           git add results/
-          git diff --cached --quiet || git commit -m "exp01 results [skip ci]"
+          git diff --cached --quiet || git commit -m "exp03 results [skip ci]"
           git push

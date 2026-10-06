@@ -2,7 +2,7 @@ name: exp02
 on:
   push:
     branches: [main]
-    paths-ignore: ['results/**']
+    paths: ['experiments/exp02_cegis/**', 'experiments/exp01_enumeration/synth.py', '.github/workflows/exp02.yml']
   workflow_dispatch:
 
 permissions:
