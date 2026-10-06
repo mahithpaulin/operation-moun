@@ -20,7 +20,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Run exp04 (no deps, stdlib only)
-        run: python3 experiments/exp04_loops/run.py --budget 1500000 --out results/exp04.json
+        run: python3 experiments/exp04_loops/run.py --budget 200000 --out results/exp04.json
       - name: Commit results
         run: |
           git config user.name "moun-bot"
