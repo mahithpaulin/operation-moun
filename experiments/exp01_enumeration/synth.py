@@ -186,4 +186,144 @@ def synthesize(task, max_size=9, max_programs=300000):
                                     bank[s].append(p)
     except BudgetOut:
         pass
-    return None
+    return {"miss": True, "tested": tested}
+
+
+class CegisEnum:
+    """Persistent-bank enumerator for CEGIS.
+
+    Key property: every program is fully evaluated ONCE, ever. When examples
+    grow, banked programs extend their signatures with ONE ev-call each
+    instead of being re-enumerated from scratch. Cost unit = ev-calls.
+    dbank holds behaviorally-distinct programs only (pruning is
+    example-relative); by_sig tracks current signatures for dedupe/hits.
+    """
+
+    def __init__(self, args):
+        self.args = args
+        self.dbank = {}      # size -> [behaviorally-DISTINCT progs]
+        self.by_sig = {}     # sig -> prog (current examples)
+        self.prog_sig = {}   # prog -> sig
+        self.envs = []
+        self.wants = []
+        self.evcalls = 0
+        self.done_size = 0
+
+    def _ev(self, p, e):
+        self.evcalls += 1
+        return ev(p, e)
+
+    def _full_sig(self, p):
+        try:
+            return tuple(self._ev(p, e) for e in self.envs)
+        except Exception:
+            return None
+
+    def _matches(self, s):
+        return (len(s) == len(self.wants) and all(
+            w == v and (not isinstance(w, bool) or isinstance(v, bool))
+            for w, v in zip(self.wants, s)))
+
+    def _register(self, p, size):
+        s = self._full_sig(p)
+        if s is None or s in self.by_sig:
+            return None
+        self.by_sig[s] = p
+        self.prog_sig[p] = s
+        self.dbank.setdefault(size, []).append(p)
+        return p if self._matches(s) else None
+
+    def add_examples(self, ios):
+        for ins, want in ios:
+            e = {a: v for a, v in zip(self.args, ins)}
+            self.envs.append(e)
+            self.wants.append(want)
+            new_by, dead = {}, []
+            for p, s in self.prog_sig.items():
+                try:
+                    v = self._ev(p, e)
+                except Exception:
+                    dead.append(p)
+                    continue
+                ns = s + (v,)
+                if ns in new_by:
+                    old = new_by[ns]
+                    if sz(p) < sz(old):
+                        dead.append(old)
+                        new_by[ns] = p
+                    else:
+                        dead.append(p)
+                else:
+                    new_by[ns] = p
+            dead_set = set(dead)
+            for p in dead:
+                self.prog_sig.pop(p, None)
+            for lst in self.dbank.values():
+                lst[:] = [p for p in lst if p not in dead_set]
+            self.by_sig = new_by
+            self.prog_sig = {p: s for s, p in new_by.items()}
+
+    def current_hit(self):
+        for s, p in self.by_sig.items():
+            if self._matches(s):
+                return p
+        return None
+
+    def gen_size(self, s, allowance):
+        def over():
+            if self.evcalls >= allowance:
+                raise BudgetOut()
+        if s == 1:
+            for a in self.args:
+                if self._register(("v", a), 1) is not None:
+                    return ("v", a)
+            for c in CONSTS:
+                st = self._register(("c", c), 1)
+                if st is not None:
+                    return st
+            return None
+        if s - 1 in self.dbank:
+            for op in UNOPS:
+                for a in list(self.dbank[s - 1]):
+                    over()
+                    p = ("u", op, a)
+                    if self._register(p, s) is not None:
+                        return p
+        for l in range(1, s - 1):
+            r = s - 1 - l
+            if l not in self.dbank or r not in self.dbank:
+                continue
+            for op in BINOPS + BOOLOPS:
+                for a in list(self.dbank[l]):
+                    for b in list(self.dbank[r]):
+                        over()
+                        p = ("b", op, a, b)
+                        if self._register(p, s) is not None:
+                            return p
+        for cs in range(1, s - 2):
+            for ts in range(1, s - 1 - cs):
+                es = s - 1 - cs - ts
+                if es < 1 or cs not in self.dbank \
+                        or ts not in self.dbank or es not in self.dbank:
+                    continue
+                for c in list(self.dbank[cs]):
+                    for t in list(self.dbank[ts]):
+                        for e in list(self.dbank[es]):
+                            over()
+                            p = ("if", c, t, e)
+                            if self._register(p, s) is not None:
+                                return p
+        return None
+
+    def generate_until_hit(self, max_size, allowance):
+        if self.done_size == 0:
+            hit = self.gen_size(1, allowance)
+            self.done_size = 1
+            if hit is not None:
+                return hit
+        while self.done_size < max_size:
+            self.done_size += 1
+            hit = self.gen_size(self.done_size, allowance)
+            if hit is not None:
+                return hit
+        return None

@@ -1,0 +1,29 @@
+name: exp02
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['results/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  exp02:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Run exp02 (no deps, stdlib only)
+        run: python3 experiments/exp02_cegis/run.py --max-size 9 --per-round 100000 --max-rounds 8 --seed-n 4 --out results/exp02.json
+      - name: Commit results
+        run: |
+          git config user.name "moun-bot"
+          git config user.email "moun-bot@users.noreply.github.com"
+          git pull --rebase 2>/dev/null || true
+          git add results/
+          git diff --cached --quiet || git commit -m "exp02 results [skip ci]"
+          git push
