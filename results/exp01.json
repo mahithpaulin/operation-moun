@@ -40,7 +40,7 @@
         "size": 6,
         "tested": 14764
       },
-      "secs": 0.64
+      "secs": 0.84
     },
     {
       "task": "abs_val",
@@ -50,7 +50,7 @@
         "size": 7,
         "tested": 22025
       },
-      "secs": 0.54
+      "secs": 0.7
     },
     {
       "task": "pow2",
@@ -70,7 +70,7 @@
         "size": 7,
         "tested": 47026
       },
-      "secs": 2.41
+      "secs": 3.17
     },
     {
       "task": "fib",
@@ -79,7 +79,7 @@
         "miss": true,
         "tested": 300000
       },
-      "secs": 16.88
+      "secs": 21.67
     }
   ]
 }
