@@ -1,0 +1,157 @@
+{
+  "rows": [
+    {
+      "task": "add",
+      "solved": true,
+      "rounds": 1,
+      "evcalls": 180,
+      "examples_used": 4,
+      "blind_examples": 8,
+      "blind_tested": 23,
+      "blind_evcalls_ub": 184,
+      "ratio": 0.978,
+      "secs": 0.0,
+      "prog": "(x + y)",
+      "trace": [
+        {
+          "round": 1,
+          "prog": "(x + y)",
+          "evcalls": 180,
+          "fail": null
+        }
+      ]
+    },
+    {
+      "task": "mul",
+      "solved": true,
+      "rounds": 1,
+      "evcalls": 828,
+      "examples_used": 4,
+      "blind_examples": 8,
+      "blind_tested": 76,
+      "blind_evcalls_ub": 608,
+      "ratio": 1.362,
+      "secs": 0.0,
+      "prog": "(x * y)",
+      "trace": [
+        {
+          "round": 1,
+          "prog": "(x * y)",
+          "evcalls": 828,
+          "fail": null
+        }
+      ]
+    },
+    {
+      "task": "is_even",
+      "solved": true,
+      "rounds": 2,
+      "evcalls": 4643,
+      "examples_used": 5,
+      "blind_examples": 8,
+      "blind_tested": 161,
+      "blind_evcalls_ub": 1288,
+      "ratio": 3.605,
+      "secs": 0.0,
+      "prog": "(not (- (x % 2)))",
+      "trace": [
+        {
+          "round": 1,
+          "prog": "(not (x // 5))",
+          "evcalls": 4132,
+          "fail": "((10,), True)"
+        },
+        {
+          "round": 2,
+          "prog": "(not (- (x % 2)))",
+          "evcalls": 4643,
+          "fail": null
+        }
+      ]
+    },
+    {
+      "task": "max_two",
+      "solved": false,
+      "rounds": 2,
+      "evcalls": 139325,
+      "examples_used": 5,
+      "blind_examples": 8,
+      "blind_tested": 14764,
+      "blind_evcalls_ub": 118112,
+      "ratio": null,
+      "secs": 0.08,
+      "prog": null,
+      "trace": [
+        {
+          "round": 1,
+          "prog": "(y % (y + 1))",
+          "evcalls": 36809,
+          "fail": "((100, -100), 100)"
+        }
+      ]
+    },
+    {
+      "task": "abs_val",
+      "solved": false,
+      "rounds": 1,
+      "evcalls": 100002,
+      "examples_used": 4,
+      "blind_examples": 8,
+      "blind_tested": 22025,
+      "blind_evcalls_ub": 176200,
+      "ratio": null,
+      "secs": 0.05,
+      "prog": null,
+      "trace": []
+    },
+    {
+      "task": "pow2",
+      "solved": true,
+      "rounds": 1,
+      "evcalls": 668,
+      "examples_used": 4,
+      "blind_examples": 8,
+      "blind_tested": 50,
+      "blind_evcalls_ub": 400,
+      "ratio": 1.67,
+      "secs": 0.0,
+      "prog": "(x * x)",
+      "trace": [
+        {
+          "round": 1,
+          "prog": "(x * x)",
+          "evcalls": 668,
+          "fail": null
+        }
+      ]
+    },
+    {
+      "task": "sum_to_n",
+      "solved": false,
+      "rounds": 1,
+      "evcalls": 100003,
+      "examples_used": 4,
+      "blind_examples": 8,
+      "blind_tested": 47026,
+      "blind_evcalls_ub": 376208,
+      "ratio": null,
+      "secs": 0.05,
+      "prog": null,
+      "trace": []
+    },
+    {
+      "task": "fib",
+      "solved": false,
+      "rounds": 1,
+      "evcalls": 100003,
+      "examples_used": 4,
+      "blind_examples": 8,
+      "blind_tested": null,
+      "blind_evcalls_ub": null,
+      "ratio": null,
+      "secs": 0.05,
+      "prog": null,
+      "trace": []
+    }
+  ]
+}
