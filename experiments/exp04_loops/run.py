@@ -15,7 +15,7 @@ from loop import synthesize_loops  # noqa: E402
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=int,
-                    default=int(os.environ.get("EXP04_BUDGET", 2000000)))
+                    default=int(os.environ.get("EXP04_BUDGET", 1500000)))
     ap.add_argument("--out", default="results/exp04.json")
     args = ap.parse_args()
 

@@ -182,9 +182,12 @@ def synthesize_loops(task, budget=3000000):
     ab, ab1 = pool(task["args"], ["a", "b"], henvs)
     ab_use = [e for e in ab if "a" in e or "b" in e]
     ab1_use = [e for e in ab1 if "a" in e or "b" in e]
-    for i0 in i0s:
-        for i1 in i0s:
-            for b in bs:
+    # Loop order b,i0,i1,u0,u1,ret: bounds almost always mention x (idx0),
+    # so the bound leads; the old i0-first order burned 138k tries inside
+    # (i0=0,i1=0) before ever advancing.
+    for b in bs:
+        for i0 in i0s:
+            for i1 in i0s:
                 for u0 in ab1_use:
                     for u1 in ab_use:
                         for ret in ("a", "b"):
@@ -209,7 +212,7 @@ HERE = Path(__file__).parent
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=int,
-                    default=int(os.environ.get("EXP04_BUDGET", 2000000)))
+                    default=int(os.environ.get("EXP04_BUDGET", 1500000)))
     ap.add_argument("--out", default="results/exp04.json")
     args = ap.parse_args()
 
