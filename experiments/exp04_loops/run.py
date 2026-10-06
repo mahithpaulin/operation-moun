@@ -16,13 +16,25 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--budget", type=int,
                     default=int(os.environ.get("EXP04_BUDGET", 1500000)))
+    ap.add_argument("--tasks", nargs="*", default=None,
+                    help="subset of task names (for CI matrix shards)")
     ap.add_argument("--out", default="results/exp04.json")
     args = ap.parse_args()
 
     rows = []
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)
+    if out.exists():
+        try:
+            rows = json.loads(out.read_text()).get("rows", [])
+        except Exception:
+            rows = []
+    done = {r["task"] for r in rows}
     for t in TASKS:
+        if args.tasks and t["name"] not in args.tasks:
+            continue
+        if t["name"] in done:
+            continue
         t0 = time.perf_counter()
         r = synthesize_loops(t, args.budget)
         dt = time.perf_counter() - t0

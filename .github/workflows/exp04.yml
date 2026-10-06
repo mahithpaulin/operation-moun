@@ -9,20 +9,45 @@ permissions:
   contents: write
 
 jobs:
-  exp04:
+  shard:
+    strategy:
+      matrix:
+        task: [sum_to_n, fib, fact, pow2n]
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - name: Run exp04 (no deps, stdlib only)
-        run: python3 experiments/exp04_loops/run.py --budget 200000 --out results/exp04.json
-      - name: Commit results
+      - name: Run exp04 shard ${{ matrix.task }}
+        run: python3 experiments/exp04_loops/run.py --budget 200000 --tasks ${{ matrix.task }} --out shard_${{ matrix.task }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp04-${{ matrix.task }}
+          path: shard_${{ matrix.task }}.json
+  merge:
+    needs: [shard]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: exp04-*
+          merge-multiple: true
+      - name: Merge + commit
         run: |
+          python3 -c "
+          import json, glob
+          rows = []
+          for f in sorted(glob.glob('shard_*.json')):
+              rows += json.load(open(f))['rows']
+          json.dump({'rows': rows}, open('results/exp04.json', 'w'), indent=2)
+          print(len(rows), 'tasks merged')
+          "
           git config user.name "moun-bot"
           git config user.email "moun-bot@users.noreply.github.com"
           git add results/
