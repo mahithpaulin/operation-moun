@@ -18,8 +18,15 @@ class Skip(Exception):
     pass
 
 
+# Library-learning hook (exp06): name -> program over x. Empty by default,
+# so exp01/exp02 behavior is unchanged. ("m", name) acts as a size-1 leaf.
+MACROS = {}
+
+
 def ev(p, env):
     t = p[0]
+    if t == "m":
+        return ev(MACROS[p[1]], env)
     if t == "v":
         return env[p[1]]
     if t == "c":
@@ -72,7 +79,7 @@ def ev(p, env):
 
 def sz(p):
     t = p[0]
-    if t in ("v", "c"):
+    if t in ("v", "c", "m"):
         return 1
     if t == "u":
         return 1 + sz(p[2])
@@ -83,6 +90,8 @@ def sz(p):
 
 def render(p):
     t = p[0]
+    if t == "m":
+        return f"{p[1]}(x)"
     if t == "v":
         return p[1]
     if t == "c":
@@ -134,6 +143,13 @@ def synthesize(task, max_size=9, max_programs=300000):
         bank[1].append(p)
     for c in CONSTS:
         p = ("c", c)
+        st = consider(p)
+        if st == "hit":
+            return {"prog": render(p), "size": 1, "tested": tested}
+        if st is True:
+            bank[1].append(p)
+    for name in MACROS:
+        p = ("m", name)
         st = consider(p)
         if st == "hit":
             return {"prog": render(p), "size": 1, "tested": tested}
